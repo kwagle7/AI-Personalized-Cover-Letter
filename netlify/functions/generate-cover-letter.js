@@ -45,7 +45,11 @@ exports.handler = async function(event, context) {
       body: JSON.stringify({ text: text.trim() }),
     };
   } catch (error) {
-    console.error('Error in generate-cover-letter function:', error);
+    console.error('--- ERROR in generate-cover-letter function ---');
+    console.error('Error name:', error.name);
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
+    console.error('Full error object:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
     return {
       statusCode: 500,
       body: JSON.stringify({ 

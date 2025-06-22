@@ -77,6 +77,12 @@ flowchart TD
 
 ---
 
+## Author
+
+Created by [@kwagle](https://github.com/kwagle7) – Kshitij Wagle
+
+---
+
 ## 📖  Additional Resources
 
 * **docs/flow.mmd** – full architecture diagram  

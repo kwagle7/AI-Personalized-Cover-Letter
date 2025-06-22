@@ -595,7 +595,7 @@ Begin Cover Letter Content Now:
         )}
       </main>
       <footer className="mt-12 text-center text-sm text-slate-500">
-        <p>&copy; {new Date().getFullYear()} AI Cover Letter Generator by <a href="https://github.com/kwagle" className="hover:underline">@kwagle</a>. Powered by Gemini.</p>
+        <p>&copy; {new Date().getFullYear()} AI Cover Letter Generator by <a href="https://linkedin.com/in/kwagle" className="hover:underline">@kwagle</a>. Powered by Gemini.</p>
         <p className="text-xs mt-1">PDF output is optimized for a single page; very long content may be truncated.</p>
       </footer>
     </div>

@@ -79,7 +79,7 @@ flowchart TD
 
 ## Author
 
-Created by [@kwagle](https://github.com/kwagle7) – Kshitij Wagle
+Created by [@kwagle](https://linkedin.com/in/kwagle) – Kshitij Wagle
 
 ---
 

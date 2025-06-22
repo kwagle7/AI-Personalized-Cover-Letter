@@ -27,8 +27,9 @@ exports.handler = async function(event, context) {
     }
 
     const ai = new GoogleGenAI({ apiKey });
-    const model = 'gemini-2.5-flash-preview-04-17';
-    
+    const model = 'gemini-2.0-flash';
+    //const model = 'gemini-2.5-flash-preview-04-17';
+
     const response = await ai.models.generateContent({
       model,
       contents: prompt,

@@ -1,0 +1,11 @@
+{
+  "name": "netlify-functions",
+  "version": "1.0.0",
+  "description": "Netlify functions for AI Cover Letter Generator",
+  "main": "generate-cover-letter.js",
+  "dependencies": {
+    "@google/genai": "^1.6.0",
+    "mime": "^3.0.0"
+  },
+  "private": true
+}

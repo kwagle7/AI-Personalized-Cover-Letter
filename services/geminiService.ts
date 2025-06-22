@@ -3,7 +3,7 @@ import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 
 // IMPORTANT: The API key MUST be set in the environment variable process.env.API_KEY
 // This application assumes process.env.API_KEY is available in the execution environment.
-const apiKey = process.env.API_KEY;
+const apiKey = process.env.REACT_APP_API_KEY;
 
 if (!apiKey) {
   console.error("API_KEY environment variable not found. Please ensure it is set.");

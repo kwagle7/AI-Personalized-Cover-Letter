@@ -378,9 +378,7 @@ Begin Cover Letter Content Now:
 
       // Create a filename with the user's full name and current date
       const safeFullName = fullName.replace(/[^a-zA-Z0-9\s-]/g, '').replace(/\s+/g, '-').toLowerCase();
-      const today = new Date();
-      const dateForFilename = today.toISOString().split('T')[0]; // YYYY-MM-DD
-      const filename = `cover-letter-${safeFullName}-${dateForFilename}.pdf`;
+      const filename = `cover-letter-${safeFullName}-${new Date().toISOString().split('T')[0]}.pdf`;
       
       doc.save(filename);
 

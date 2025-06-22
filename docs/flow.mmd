@@ -1,0 +1,24 @@
+%% Full architecture diagram for AI Personalized Cover Letter
+
+flowchart TD
+    subgraph Client
+        A[User fills form]
+        A --> B[Next.js / React UI]
+        B -->|Generate button| C[fetch /api/generate-cover-letter]
+    end
+
+    subgraph Server(Netlify Function)
+        C --> D[validate input & compose prompt]
+        D --> E[GoogleGenAI SDK]
+        E -->|model: gemini-2.0-flash| F((Google Gemini API))
+        F -->|cover-letter text| E --> G[Return JSON {text}]
+    end
+
+    G --> B
+    B --> H[Preview Tab]
+    B --> I[Copy ↘︎ Clipboard]
+    B --> J[Download ↘︎ jsPDF]
+
+    style Client fill:#dbeafe,stroke:#3b82f6,stroke-width:1px
+    style Server fill:#ffedd5,stroke:#f97316,stroke-width:1px
+    style F fill:#fef9c3,stroke:#facc15,stroke-width:1px

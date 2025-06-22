@@ -234,6 +234,42 @@ Begin Cover Letter Content Now:
       doc.setLineHeightFactor(lineSpacingFactor);
 
       const calculateLineHeight = (fontSize: number, customLineSpacingFactor?: number) => (fontSize * (customLineSpacingFactor || doc.getLineHeightFactor())) / doc.internal.scaleFactor;
+
+        // Helper to parse inline markdown for **bold** and *italic* (italic styling not rendered but cleans asterisks)
+        const parseMarkdownInline = (text: string): { text: string; bold: boolean }[] => {
+          const segments: { text: string; bold: boolean }[] = [];
+          let current = '';
+          let boldActive = false;
+
+          for (let i = 0; i < text.length; ) {
+            const twoChar = text.slice(i, i + 2);
+            // Toggle bold on ** or __
+            if (twoChar === '**' || twoChar === '__') {
+              if (current) {
+                segments.push({ text: current, bold: boldActive });
+                current = '';
+              }
+              boldActive = !boldActive;
+              i += 2;
+              continue;
+            }
+            // Skip single * or _ used for italics (we don't render italic but remove markers)
+            if (text[i] === '*' || text[i] === '_') {
+              if (current) {
+                segments.push({ text: current, bold: boldActive });
+                current = '';
+              }
+              i += 1;
+              continue;
+            }
+            current += text[i];
+            i += 1;
+          }
+          if (current) {
+            segments.push({ text: current, bold: boldActive });
+          }
+          return segments;
+        };
       let currentLineHeight = calculateLineHeight(defaultFontSize);
 
       const aiGeneratedContent = coverLetter.trim();
@@ -251,11 +287,10 @@ Begin Cover Letter Content Now:
         const trimmedLine = lineText.trim();
         const nextLineTrimmed = (i + 1 < rawLines.length) ? rawLines[i+1].trim() : null;
         
-        const bulletRegex = /^\s*([\*\-])\s*(.*)/; // Regex to catch '*' or '-' bullets, possibly with no space after
-        const bulletMatch = trimmedLine.match(bulletRegex);
-       
-        const isStartingNewBulletList = bulletMatch && !isInsideBulletList;
-        const isEndingCurrentBulletList = isInsideBulletList && !bulletMatch && trimmedLine !== ""; // End list if not a bullet and not an empty line
+        const isBulletLine = trimmedLine.startsWith('* ') || trimmedLine.startsWith('- ');
+
+        const isStartingNewBulletList = isBulletLine && !isInsideBulletList;
+        const isEndingCurrentBulletList = isInsideBulletList && !isBulletLine && trimmedLine !== ""; // End list if not a bullet and not an empty line
 
         if (isStartingNewBulletList) {
             yPosition += paragraphSpacingMM * 0.5; // Slightly less space before a new bullet list starts
@@ -309,13 +344,13 @@ Begin Cover Letter Content Now:
         doc.setTextColor(bodyTextColor);
         currentLineHeight = calculateLineHeight(defaultFontSize);
 
-        // 3. Bullet Points (using regex match)
+        // 3. Bullet Points
         let textToPrint = trimmedLine;
         let indent = 0;
-        
-        if (bulletMatch) {
-            textToPrint = bulletMatch[2].trim(); // Content of the bullet point
-            indent = bulletIndentFactor; 
+
+        if (isBulletLine) {
+            textToPrint = trimmedLine.slice(2).trim(); // remove bullet marker and following space
+            indent = bulletIndentFactor;
         }
 
         const splitLines = doc.splitTextToSize(textToPrint, textWidth - indent);
@@ -326,38 +361,32 @@ Begin Cover Letter Content Now:
             }
 
             let currentX = margin;
-            if (bulletMatch) {
+            if (isBulletLine) {
                 if (subLineIndex === 0) { 
                     doc.text(bulletChar, currentX, yPosition);
                 }
                 currentX += indent; 
             }
-            
-            const parts = subLine.split(/(\*\*.*?\*\*|__.*?__)/g).filter(part => part); 
-            parts.forEach(part => {
+
+            const segments = parseMarkdownInline(subLine);
+            segments.forEach(seg => {
                 const effectiveTextWidth = textWidth - (currentX - margin);
                 if (effectiveTextWidth <= 0) return;
 
-                if ((part.startsWith('**') && part.endsWith('**')) || (part.startsWith('__') && part.endsWith('__'))) {
-                    doc.setFont('Helvetica', 'bold');
-                    const boldText = part.substring(2, part.length - 2);
-                    doc.text(boldText, currentX, yPosition, { maxWidth: effectiveTextWidth });
-                    currentX += doc.getStringUnitWidth(boldText) * defaultFontSize / doc.internal.scaleFactor;
-                } else {
-                    doc.setFont('Helvetica', 'normal');
-                    doc.text(part, currentX, yPosition, { maxWidth: effectiveTextWidth });
-                    currentX += doc.getStringUnitWidth(part) * defaultFontSize / doc.internal.scaleFactor;
-                }
+                doc.setFont('Helvetica', seg.bold ? 'bold' : 'normal');
+                doc.text(seg.text, currentX, yPosition, { maxWidth: effectiveTextWidth });
+                currentX += doc.getStringUnitWidth(seg.text) * defaultFontSize / doc.internal.scaleFactor;
             });
+
             yPosition += currentLineHeight;
         });
-        
-        if (!bulletMatch && trimmedLine !== "") { 
+
+        if (!isBulletLine && trimmedLine !== "") {
              yPosition += paragraphSpacingMM * 0.25; // Less spacing after normal lines to be tight
-        } else if (bulletMatch && nextLineTrimmed !== null && !(nextLineTrimmed.match(bulletRegex))) {
-            // This was the last item of a bullet list that has non-bullet text following it
-             yPosition += paragraphSpacingMM * 0.5; 
-             isInsideBulletList = false; 
+        } else if (isBulletLine && nextLineTrimmed !== null && !(nextLineTrimmed.startsWith('* ') || nextLineTrimmed.startsWith('- '))) {
+             // This was the last item of a bullet list that has non-bullet text following it
+             yPosition += paragraphSpacingMM * 0.5;
+             isInsideBulletList = false;
         }
          if (trimmedLine === "" && nextLineTrimmed !== null && nextLineTrimmed !== "") { 
              yPosition += paragraphSpacingMM * 0.75;

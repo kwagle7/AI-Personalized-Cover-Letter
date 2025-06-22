@@ -72,3 +72,13 @@ out
 
 # Local development
 *.local
+
+# Vercel
+.vercel
+
+# Next.js
+.next
+out
+
+# Environment variables
+.env*.local

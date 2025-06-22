@@ -290,7 +290,7 @@ Begin Cover Letter Content Now:
             if (yPosition + currentLineHeight > pageHeight - margin) break;
             
             const splitHeading = doc.splitTextToSize(headingText, textWidth);
-            splitHeading.forEach(hLine => {
+            splitHeading.forEach((hLine: string) => {
                 if (yPosition + currentLineHeight > pageHeight - margin) return;
                 doc.text(hLine, margin, yPosition);
                 yPosition += currentLineHeight;
@@ -320,7 +320,7 @@ Begin Cover Letter Content Now:
 
         const splitLines = doc.splitTextToSize(textToPrint, textWidth - indent);
 
-        splitLines.forEach((subLine, subLineIndex) => {
+        splitLines.forEach((subLine: string, subLineIndex: number) => {
             if (yPosition + currentLineHeight > pageHeight - margin - ( (i === rawLines.length -1 && subLineIndex === splitLines.length -1) ? calculateLineHeight(defaultFontSize) * 2.5 : 0 ) ) {
                 return; 
             }
@@ -333,8 +333,8 @@ Begin Cover Letter Content Now:
                 currentX += indent; 
             }
             
-            const parts = subLine.split(/(\*\*.*?\*\*|__.*?__)/g).filter(part => part); 
-            parts.forEach(part => {
+            const parts = subLine.split(/(\*\*.*?\*\*|__.*?__)/g).filter((part: string) => part); 
+            parts.forEach((part: string) => {
                 const effectiveTextWidth = textWidth - (currentX - margin);
                 if (effectiveTextWidth <= 0) return;
 
@@ -397,177 +397,236 @@ Begin Cover Letter Content Now:
   const allInputsDisabled = isLoading || isDownloadingPdf;
 
   return (
-    <div className="container mx-auto p-4 md:p-8 bg-slate-800 shadow-2xl rounded-xl border border-slate-700">
-      <header className="mb-8 text-center">
-        <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-cyan-300 mb-2">
-          AI Cover Letter Generator
-        </h1>
-        <p className="text-slate-400 text-lg">
-          Craft a compelling, professional cover letter in minutes.
-        </p>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white shadow">
+        <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+          <h1 className="text-3xl font-bold text-gray-900">Cover Letter Generator</h1>
+          <div className="mt-1 flex items-center text-sm text-gray-500">
+            <span>Powered by AI</span>
+            <span className="mx-2">•</span>
+            <span>Create a tailored cover letter in seconds</span>
+          </div>
+        </div>
       </header>
 
-      <main>
-        <section aria-labelledby="personal-info-heading" className="mb-8 p-6 bg-slate-700/30 rounded-lg border border-slate-600">
-            <h2 id="personal-info-heading" className="text-xl font-semibold text-sky-300 mb-4">Your Information (for PDF Header)</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                <InputField
-                    id="fullName"
-                    label="Full Name"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    placeholder="e.g., Jane Doe"
-                    disabled={allInputsDisabled}
-                    required
-                    icon={<UserIcon className="w-5 h-5 text-slate-400" />}
-                />
-                <InputField
-                    id="email"
-                    label="Email Address"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="e.g., jane.doe@example.com"
-                    disabled={allInputsDisabled}
-                    required
-                    icon={<MailIcon className="w-5 h-5 text-slate-400" />}
-                />
-                <InputField
-                    id="location"
-                    label="Location"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    placeholder="e.g., San Francisco, CA"
-                    disabled={allInputsDisabled}
-                    icon={<MapPinIcon className="w-5 h-5 text-slate-400" />}
-                />
-                <InputField
-                    id="phone"
-                    label="Phone Number"
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="e.g., (555) 123-4567"
-                    disabled={allInputsDisabled}
-                    icon={<PhoneIcon className="w-5 h-5 text-slate-400" />}
-                />
-                <InputField
-                    id="linkedin"
-                    label="LinkedIn Profile URL (or username)"
-                    value={linkedin}
-                    onChange={(e) => setLinkedin(e.target.value)}
-                    placeholder="e.g., linkedin.com/in/janedoe or janedoe"
-                    disabled={allInputsDisabled}
-                    icon={<LinkedinIcon className="w-5 h-5 text-slate-400" />}
-                />
-                <div>
-                  <InputField
-                      id="website"
-                      label="Personal Website/Portfolio URL"
-                      value={website}
-                      onChange={(e) => setWebsite(e.target.value)}
-                      placeholder="e.g., janedoe.com"
-                      disabled={allInputsDisabled}
-                      icon={<LinkIcon className="w-5 h-5 text-slate-400" />}
-                  />
-                  <p className="text-xs text-slate-500 mt-1 pl-1">If provided, AI will try to weave in portfolio highlights if relevant and concise.</p>
-                </div>
-            </div>
-        </section>
-
-        <div className="mb-6">
-          <TextAreaField
-            id="resumeContent"
-            label="Your Resume (Optional)"
-            value={resumeContent}
-            onChange={(e) => setResumeContent(e.target.value)}
-            placeholder="Paste your resume content here to tailor the cover letter further..."
-            rows={10}
-            disabled={allInputsDisabled}
-            className="mb-6"
-          />
-          <TextAreaField
-            id="jobDescription"
-            label="Job Description"
-            value={jobDescription}
-            onChange={(e) => setJobDescription(e.target.value)}
-            placeholder="Paste the full job description here..."
-            rows={8}
-            disabled={allInputsDisabled}
-            required
-          />
-        </div>
-
-        <div className="mb-6 text-center">
-          <Button
-            onClick={handleGenerateCoverLetter}
-            disabled={!isFormValid || allInputsDisabled}
-            variant="primary"
-            className="w-full md:w-auto"
-            aria-label="Generate Cover Letter based on Job Description and Personal Information"
-          >
-            {isLoading ? (
-              <>
-                <LoadingSpinner className="w-5 h-5 mr-2" />
-                Generating...
-              </>
-            ) : (
-              '✨ Generate Cover Letter'
-            )}
-          </Button>
-        </div>
-
-        {error && (
-          <div className="mb-6 p-4 bg-red-700/30 border border-red-500 text-red-300 rounded-lg flex items-start space-x-3"
-               role="alert" aria-live="assertive">
-            <AlertTriangleIcon className="w-6 h-6 text-red-400 flex-shrink-0 mt-0.5" />
-            <div>
-              <h3 className="font-semibold">Operation Failed</h3>
-              <p className="text-sm">{error}</p>
+      <main className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+        {/* Personal Info Section */}
+        <div className="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
+          <div className="px-4 py-5 sm:p-6">
+            <h2 className="text-lg font-medium text-gray-900 mb-4">Your Information</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <InputField
+                id="fullName"
+                label="Full Name"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder="Your full name"
+                disabled={allInputsDisabled}
+                required
+              />
+              <InputField
+                id="email"
+                label="Email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="your.email@example.com"
+                disabled={allInputsDisabled}
+                required
+              />
+              <InputField
+                id="phone"
+                label="Phone"
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="(123) 456-7890"
+                disabled={allInputsDisabled}
+              />
+              <InputField
+                id="linkedin"
+                label="LinkedIn Profile"
+                value={linkedin}
+                onChange={(e) => setLinkedin(e.target.value)}
+                placeholder="linkedin.com/in/yourprofile"
+                disabled={allInputsDisabled}
+              />
             </div>
           </div>
-        )}
+        </div>
 
-        {coverLetter && !isLoading && (
-          <div className="mt-8 p-6 bg-slate-700/50 border border-slate-600 rounded-lg shadow-lg" aria-labelledby="generated-cover-letter-heading">
-            <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-4 gap-3 sm:gap-0">
-              <h2 id="generated-cover-letter-heading" className="text-2xl font-semibold text-sky-300">Your Generated Cover Letter:</h2>
-              <div className="flex space-x-2">
-                <Button onClick={handleCopyToClipboard} variant="secondary" size="sm" disabled={isCopied || allInputsDisabled} aria-label="Copy generated cover letter to clipboard">
-                  {isCopied ? <CheckIcon className="w-5 h-5 mr-1.5" /> : <CopyIcon className="w-5 h-5 mr-1.5" />}
-                  {isCopied ? 'Copied!' : 'Copy Text'}
-                </Button>
-                <Button 
-                  onClick={handleDownloadPdf} 
-                  variant="secondary" 
-                  size="sm" 
-                  disabled={allInputsDisabled || !fullName.trim()}
-                  aria-label="Download generated cover letter as PDF"
-                >
-                  {isDownloadingPdf ? (
-                    <>
-                      <LoadingSpinner className="w-4 h-4 mr-1.5" />
-                      Downloading...
-                    </>
-                  ) : (
-                    <>
-                      <DownloadIcon className="w-5 h-5 mr-1.5" />
-                      Download PDF
-                    </>
+        {/* Main Content Area */}
+        <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+          {/* Tabs */}
+          <div className="border-b border-gray-200">
+            <nav className="flex -mb-px">
+              <button
+                className="border-b-2 border-indigo-500 text-indigo-600 px-4 py-4 text-sm font-medium"
+              >
+                Cover Letter
+              </button>
+              <button
+                className="border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 px-4 py-4 text-sm font-medium"
+                disabled
+              >
+                Resume (Coming Soon)
+              </button>
+            </nav>
+          </div>
+
+          <div className="px-4 py-5 sm:p-6">
+            {/* Split View */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Left Side - Job Description */}
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <label htmlFor="jobDescription" className="block text-sm font-medium text-gray-700">
+                    Job Description
+                  </label>
+                  <span className="text-xs text-gray-500">
+                    {jobDescription.length} characters
+                  </span>
+                </div>
+                <div className="mt-1">
+                  <TextAreaField
+                    id="jobDescription"
+                    value={jobDescription}
+                    onChange={(e) => setJobDescription(e.target.value)}
+                    placeholder="Paste the job description here..."
+                    rows={16}
+                    disabled={allInputsDisabled}
+                    required
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  />
+                </div>
+                <div className="mt-4">
+                  <Button
+                    onClick={handleGenerateCoverLetter}
+                    disabled={!isFormValid || allInputsDisabled}
+                    className="w-full justify-center"
+                  >
+                    {isLoading ? (
+                      <>
+                        <LoadingSpinner className="w-5 h-5 mr-2" />
+                        Generating...
+                      </>
+                    ) : (
+                      'Generate Cover Letter'
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              {/* Right Side - Generated Cover Letter */}
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Generated Cover Letter
+                  </label>
+                  {coverLetter && (
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={handleCopyToClipboard}
+                        disabled={isCopied}
+                        className="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                      >
+                        {isCopied ? 'Copied!' : 'Copy'}
+                      </button>
+                      <button
+                        onClick={handleDownloadPdf}
+                        disabled={isDownloadingPdf}
+                        className="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                      >
+                        Download PDF
+                      </button>
+                    </div>
                   )}
-                </Button>
+                </div>
+                <div className="mt-1">
+                  {coverLetter ? (
+                    <div className="h-[500px] overflow-y-auto p-4 border border-gray-300 rounded-md bg-gray-50">
+                      <pre className="whitespace-pre-wrap font-sans text-sm text-gray-800">
+                        {coverLetter}
+                      </pre>
+                    </div>
+                  ) : (
+                    <div className="h-[500px] flex items-center justify-center border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
+                      <div className="text-center">
+                        <svg
+                          className="mx-auto h-12 w-12 text-gray-400"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={1}
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                          />
+                        </svg>
+                        <h3 className="mt-2 text-sm font-medium text-gray-900">No cover letter generated yet</h3>
+                        <p className="mt-1 text-sm text-gray-500">
+                          Paste a job description and click "Generate Cover Letter" to get started.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-            <pre className="whitespace-pre-wrap text-slate-300 bg-slate-900/50 p-4 rounded-md overflow-x-auto text-sm leading-relaxed" aria-label="Generated cover letter content">
-              {coverLetter}
-            </pre>
-            <p className="mt-2 text-xs text-slate-400 italic">Note: For PDF download, your name ("{fullName}") will be appended after the AI-generated closing. The PDF uses markdown (bold, bullets, ## Headings, ---***--- separators) and aims for a single page (long content may be truncated). Today's date is included.</p>
           </div>
-        )}
+        </div>
+
+        {/* Hidden Resume Textarea (for form validation) */}
+        <div className="hidden">
+          <TextAreaField
+            id="resumeContent"
+            value={resumeContent}
+            onChange={(e) => setResumeContent(e.target.value)}
+          />
+        </div>
+
       </main>
-      <footer className="mt-12 text-center text-sm text-slate-500">
-        <p>&copy; {new Date().getFullYear()} AI Cover Letter Generator. Powered by Gemini.</p>
-        <p className="text-xs mt-1">PDF output is optimized for a single page; very long content may be truncated.</p>
+
+      {/* Error Alert */}
+      {error && (
+        <div className="fixed bottom-4 right-4 max-w-md">
+          <div className="rounded-md bg-red-50 p-4 shadow-lg">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <AlertTriangleIcon className="h-5 w-5 text-red-400" aria-hidden="true" />
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-red-800">Error generating cover letter</h3>
+                <div className="mt-2 text-sm text-red-700">
+                  <p>{error}</p>
+                </div>
+                <div className="mt-4">
+                  <div className="-mx-2 -my-1.5 flex">
+                    <button
+                      type="button"
+                      onClick={() => setError(null)}
+                      className="rounded-md bg-red-50 px-2 py-1.5 text-sm font-medium text-red-800 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 focus:ring-offset-red-50"
+                    >
+                      Dismiss
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Footer */}
+      <footer className="bg-white border-t border-gray-200 mt-8">
+        <div className="max-w-7xl mx-auto py-6 px-4 overflow-hidden sm:px-6 lg:px-8">
+          <p className="text-center text-sm text-gray-500">
+            &copy; {new Date().getFullYear()} Cover Letter Generator. All rights reserved.
+          </p>
+        </div>
       </footer>
     </div>
   );

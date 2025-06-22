@@ -1,0 +1,17 @@
+.git
+.gitignore
+node_modules
+.env
+.env.local
+.env.*.local
+.netlify
+.netlify.toml
+*.md
+*.mdx
+.editorconfig
+.gitattributes
+.vscode
+.idea
+*.log
+.cache
+dist

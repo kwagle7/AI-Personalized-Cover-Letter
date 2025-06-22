@@ -1,4 +1,10 @@
 
+interface GenerateCoverLetterResponse {
+  text: string;
+  error?: string;
+  details?: string;
+}
+
 export const generateCoverLetter = async (prompt: string): Promise<string> => {
   try {
     const response = await fetch('/api/generate-cover-letter', {
@@ -9,12 +15,16 @@ export const generateCoverLetter = async (prompt: string): Promise<string> => {
       body: JSON.stringify({ prompt }),
     });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || 'Failed to generate cover letter');
+    const data: GenerateCoverLetterResponse = await response.json();
+
+    if (!response.ok || data.error) {
+      throw new Error(data.error || 'Failed to generate cover letter');
     }
 
-    const data = await response.json();
+    if (!data.text) {
+      throw new Error('No content was generated');
+    }
+
     return data.text;
   } catch (error) {
     console.error('Error generating cover letter:', error);
